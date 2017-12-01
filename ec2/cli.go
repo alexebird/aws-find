@@ -13,7 +13,7 @@ func cliAction(c *cli.Context) error {
 		return err
 	}
 
-	instances := describeInstances(client, c.Bool("all"))
+	instances := describeInstances(client, c.Bool("all"), c.String("filter"))
 
 	if c.Bool("all") == false && d.DavinciEnvFull() != nil {
 		davinciShortFormTable(instances)
@@ -25,6 +25,10 @@ func cliAction(c *cli.Context) error {
 		longFormTable(instances)
 	}
 
+	if c.Bool("connect") {
+		connect(instances)
+	}
+
 	return nil
 }
 
@@ -34,7 +38,15 @@ func CliCommand() cli.Command {
 		cli.BoolFlag{
 			Name:  "all, a",
 			Usage: "dont do default filtering",
-			//Destination: &all,
+		},
+		cli.BoolFlag{
+			Name:  "connect, c",
+			Usage: "connect to the first matching host",
+		},
+		cli.StringFlag{
+			Name:  "filter, f",
+			Value: "",
+			Usage: "filter by instance name",
 		},
 	}
 

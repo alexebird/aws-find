@@ -10,7 +10,7 @@ pkg/darwin_amd64/$(BINARY): $(SOURCE_FILES)
 	go build -v -o "$@"
 
 pkg/linux_amd64/$(BINARY): $(SOURCE_FILES)
-	GOOS=linux GOARCH=amd64 \
+	jOOS=linux GOARCH=amd64 \
 	go build -v -o "$@"
 
 install:

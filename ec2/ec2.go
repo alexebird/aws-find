@@ -1,21 +1,30 @@
 package ec2
 
 import (
-	//"fmt"
+	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/alexebird/tableme/tableme"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/kballard/go-shellquote"
 	//"github.com/davecgh/go-spew/spew"
 )
 
-//type Ec2Instance struct {
-//}
+func filterInstances(instances []*ec2.Instance, test func(*ec2.Instance) bool) (ret []*ec2.Instance) {
+	for _, i := range instances {
+		if test(i) {
+			ret = append(ret, i)
+		}
+	}
+	return
+}
 
-func describeInstances(client *ec2.EC2, all bool) []*ec2.Instance {
+func describeInstances(client *ec2.EC2, all bool, nameFilter string) []*ec2.Instance {
 	var filters []*ec2.Filter
 
 	if all == true {
@@ -35,7 +44,6 @@ func describeInstances(client *ec2.EC2, all bool) []*ec2.Instance {
 	err := client.DescribeInstancesPages(params,
 		func(page *ec2.DescribeInstancesOutput, lastPage bool) bool {
 			for _, res := range page.Reservations {
-				//spew.Dump(res)
 				instances = append(instances, res.Instances...)
 			}
 			return true
@@ -43,6 +51,11 @@ func describeInstances(client *ec2.EC2, all bool) []*ec2.Instance {
 
 	if err != nil {
 		panic(err)
+	}
+
+	if len(nameFilter) > 0 {
+		filterTest := func(i *ec2.Instance) bool { return strings.Contains(*findTagByKey(i, "Name"), nameFilter) }
+		instances = filterInstances(instances, filterTest)
 	}
 
 	return instances
@@ -66,7 +79,6 @@ func davinciShortFormTable(instances []*ec2.Instance) {
 	records := make([][]string, 0)
 
 	for _, inst := range instances {
-		//spew.Dump(inst)
 		rec := []string{
 			*inst.PrivateIpAddress,
 			*findTagByKey(inst, "Name"),
@@ -102,7 +114,6 @@ func davinciLongFormTable(instances []*ec2.Instance) {
 	records := make([][]string, 0)
 
 	for _, inst := range instances {
-		//spew.Dump(inst)
 		time := inst.LaunchTime.Format(time.RFC3339)
 
 		rec := []string{
@@ -136,7 +147,6 @@ func shortFormTable(instances []*ec2.Instance) {
 	records := make([][]string, 0)
 
 	for _, inst := range instances {
-		//spew.Dump(inst)
 		rec := []string{
 			*inst.PrivateIpAddress,
 			*findTagByKey(inst, "Name"),
@@ -162,7 +172,6 @@ func longFormTable(instances []*ec2.Instance) {
 	records := make([][]string, 0)
 
 	for _, inst := range instances {
-		//spew.Dump(inst)
 		time := inst.LaunchTime.Format(time.RFC3339)
 
 		rec := []string{
@@ -183,6 +192,42 @@ func longFormTable(instances []*ec2.Instance) {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func sshCommand(username string, ip string) []string {
+	return []string{"ssh", "-o", "StrictHostKeyChecking no", fmt.Sprintf("%s@%s", username, ip)}
+}
+
+func execInteractive(cmdArgs []string) {
+	cmd := exec.Command(cmdArgs[0], cmdArgs[1:len(cmdArgs)]...)
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func chooseInstanceForConnect(instances []*ec2.Instance) *ec2.Instance {
+	return instances[0]
+}
+
+func connect(instances []*ec2.Instance) {
+	inst := chooseInstanceForConnect(instances)
+	name := withDefault(findTagByKey(inst, "Name"), "")
+	ip := *inst.PrivateIpAddress
+
+	cmd := sshCommand("ubuntu", ip)
+
+	fmt.Println()
+	fmt.Printf("==> connecting to %s(%s)\n", name, ip)
+	fmt.Printf("==> via: %s\n", shellquote.Join(cmd...))
+	fmt.Println()
+
+	execInteractive(cmd)
 }
 
 func setup() (*ec2.EC2, error) {
