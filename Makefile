@@ -1,4 +1,4 @@
-BINARY := aws-find
+BINARY := af
 PROJECT_ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 SOURCE_FILES := main.go
 
@@ -12,6 +12,10 @@ pkg/darwin_amd64/$(BINARY): $(SOURCE_FILES)
 pkg/linux_amd64/$(BINARY): $(SOURCE_FILES)
 	GOOS=linux GOARCH=amd64 \
 	go build -v -o "$@"
+
+install:
+	cp pkg/linux_amd64/$(BINARY) /usr/local/bin/$(BINARY)
+	chmod 755 /usr/local/bin/$(BINARY)
 
 .PHONY: deps
 deps:

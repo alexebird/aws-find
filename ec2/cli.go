@@ -2,12 +2,12 @@ package ec2
 
 import (
 	d "github.com/alexebird/aws-find/davinci"
-	"github.com/davecgh/go-spew/spew"
+	//"github.com/davecgh/go-spew/spew"
 	"github.com/urfave/cli"
 )
 
 func cliAction(c *cli.Context) error {
-	spew.Dump(c.Bool("all"))
+	//spew.Dump(c.Bool("all"))
 	client, err := setup()
 	if err != nil {
 		return err
@@ -17,10 +17,12 @@ func cliAction(c *cli.Context) error {
 
 	if c.Bool("all") == false && d.DavinciEnvFull() != nil {
 		davinciShortFormTable(instances)
-	} else if c.Bool("all") == true && d.DavinciEnvFull() != nil {
-		davinciLongFormTable(instances)
 	} else if c.Bool("all") == false && d.DavinciEnvFull() == nil {
 		shortFormTable(instances)
+	} else if c.Bool("all") == true && d.DavinciEnvFull() != nil {
+		davinciLongFormTable(instances)
+	} else if c.Bool("all") == true && d.DavinciEnvFull() == nil {
+		longFormTable(instances)
 	}
 
 	return nil
