@@ -3,18 +3,18 @@ PROJECT_ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 SOURCE_FILES := main.go ec2/cli.go ec2/ec2.go
 
 .PHONY: all
-all: pkg/darwin_amd64/$(BINARY) pkg/linux_amd64/$(BINARY)
+all: pkg/darwin_amd64/$(BINARY)-darwin-amd64 pkg/linux_amd64/$(BINARY)-linux-amd64
 
-pkg/darwin_amd64/$(BINARY): $(SOURCE_FILES)
+pkg/darwin_amd64/$(BINARY)-darwin-amd64: $(SOURCE_FILES)
 	GOOS=darwin GOARCH=amd64 \
 	go build -v -o "$@"
 
-pkg/linux_amd64/$(BINARY): $(SOURCE_FILES)
-	jOOS=linux GOARCH=amd64 \
+pkg/linux_amd64/$(BINARY)-linux-amd64: $(SOURCE_FILES)
+	GOOS=linux GOARCH=amd64 \
 	go build -v -o "$@"
 
 install:
-	cp pkg/linux_amd64/$(BINARY) /usr/local/bin/$(BINARY)
+	cp pkg/linux_amd64/$(BINARY)-linux-amd64 /usr/local/bin/$(BINARY)
 	chmod 755 /usr/local/bin/$(BINARY)
 
 .PHONY: deps
@@ -24,4 +24,4 @@ deps:
 .PHONY: clean
 clean:
 	go clean -i -x -v
-	rm -f pkg/darwin_amd64/$(BINARY) pkg/linux_amd64/$(BINARY)
+	rm -f pkg/darwin_amd64/$(BINARY)-darwin-amd64 pkg/linux_amd64/$(BINARY)-linux-amd64
