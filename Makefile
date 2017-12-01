@@ -1,6 +1,6 @@
 BINARY := af
 PROJECT_ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-SOURCE_FILES := main.go
+SOURCE_FILES := main.go ec2/cli.go ec2/ec2.go
 
 .PHONY: all
 all: pkg/darwin_amd64/$(BINARY) pkg/linux_amd64/$(BINARY)
@@ -23,4 +23,5 @@ deps:
 
 .PHONY: clean
 clean:
-	go clean -i -x
+	go clean -i -x -v
+	rm -f pkg/darwin_amd64/$(BINARY) pkg/linux_amd64/$(BINARY)
