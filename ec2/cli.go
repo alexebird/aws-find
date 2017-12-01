@@ -26,7 +26,8 @@ func cliAction(c *cli.Context) error {
 	}
 
 	if c.Bool("connect") {
-		connect(instances)
+		inst := chooseInstanceForConnect(instances)
+		connect(inst)
 	}
 
 	return nil

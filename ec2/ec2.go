@@ -194,8 +194,8 @@ func longFormTable(instances []*ec2.Instance) {
 	}
 }
 
-func sshCommand(username string, ip string) []string {
-	return []string{"ssh", "-o", "StrictHostKeyChecking no", fmt.Sprintf("%s@%s", username, ip)}
+func sshCommand(ip string) []string {
+	return []string{"ssh", ip}
 }
 
 func execInteractive(cmdArgs []string) {
@@ -215,16 +215,15 @@ func chooseInstanceForConnect(instances []*ec2.Instance) *ec2.Instance {
 	return instances[0]
 }
 
-func connect(instances []*ec2.Instance) {
-	inst := chooseInstanceForConnect(instances)
+func connect(inst *ec2.Instance) {
 	name := withDefault(findTagByKey(inst, "Name"), "")
 	ip := *inst.PrivateIpAddress
 
-	cmd := sshCommand("ubuntu", ip)
+	cmd := sshCommand(ip)
 
 	fmt.Println()
 	fmt.Printf("==> connecting to %s(%s)\n", name, ip)
-	fmt.Printf("==> via: %s\n", shellquote.Join(cmd...))
+	fmt.Printf("==> via command: %s\n", shellquote.Join(cmd...))
 	fmt.Println()
 
 	execInteractive(cmd)
