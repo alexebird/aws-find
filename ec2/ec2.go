@@ -54,7 +54,14 @@ func describeInstances(client *ec2.EC2, all bool, nameFilter string) []*ec2.Inst
 	}
 
 	if len(nameFilter) > 0 {
-		filterTest := func(i *ec2.Instance) bool { return strings.Contains(*findTagByKey(i, "Name"), nameFilter) }
+		filterTest := func(i *ec2.Instance) bool {
+			nameTagValue := findTagByKey(i, "Name")
+			if nameTagValue != nil {
+				return strings.Contains(*nameTagValue, nameFilter)
+			} else {
+				return false
+			}
+		}
 		instances = filterInstances(instances, filterTest)
 	}
 
