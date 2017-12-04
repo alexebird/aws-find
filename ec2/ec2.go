@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexebird/aws-find/util"
 	"github.com/alexebird/tableme/tableme"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -105,14 +106,6 @@ func davinciShortFormTable(instances []*ec2.Instance) {
 	}
 }
 
-func withDefault(val *string, defaultVal string) string {
-	if val != nil {
-		return *val
-	} else {
-		return defaultVal
-	}
-}
-
 func davinciLongFormTable(instances []*ec2.Instance) {
 	headers := []string{
 		"PUBLIC_IP", "PRIVATE_IP", "NAME", "COLOR", "ROLE", "ENV", "STATE", "TYPE", "IMAGE", "LAUNCHED", "KEY", "ID", //"SUBNET", "CIDR",
@@ -124,18 +117,18 @@ func davinciLongFormTable(instances []*ec2.Instance) {
 		time := inst.LaunchTime.Format(time.RFC3339)
 
 		rec := []string{
-			withDefault(inst.PublicIpAddress, ""),
-			withDefault(inst.PrivateIpAddress, ""),
-			withDefault(findTagByKey(inst, "Name"), ""),
-			withDefault(findTagByKey(inst, "color"), ""),
-			withDefault(findTagByKey(inst, "role"), ""),
-			withDefault(findTagByKey(inst, "env"), ""),
-			withDefault(inst.State.Name, ""),
-			withDefault(inst.InstanceType, ""),
-			withDefault(inst.ImageId, ""),
-			withDefault(&time, ""),
-			withDefault(inst.KeyName, ""),
-			withDefault(inst.InstanceId, ""),
+			util.WithEmptyStringDefault(inst.PublicIpAddress),
+			util.WithEmptyStringDefault(inst.PrivateIpAddress),
+			util.WithEmptyStringDefault(findTagByKey(inst, "Name")),
+			util.WithEmptyStringDefault(findTagByKey(inst, "color")),
+			util.WithEmptyStringDefault(findTagByKey(inst, "role")),
+			util.WithEmptyStringDefault(findTagByKey(inst, "env")),
+			util.WithEmptyStringDefault(inst.State.Name),
+			util.WithEmptyStringDefault(inst.InstanceType),
+			util.WithEmptyStringDefault(inst.ImageId),
+			util.WithEmptyStringDefault(&time),
+			util.WithEmptyStringDefault(inst.KeyName),
+			util.WithEmptyStringDefault(inst.InstanceId),
 		}
 		records = append(records, rec)
 	}
@@ -182,15 +175,15 @@ func longFormTable(instances []*ec2.Instance) {
 		time := inst.LaunchTime.Format(time.RFC3339)
 
 		rec := []string{
-			withDefault(inst.PublicIpAddress, ""),
-			withDefault(inst.PrivateIpAddress, ""),
-			withDefault(findTagByKey(inst, "Name"), ""),
-			withDefault(inst.State.Name, ""),
-			withDefault(inst.InstanceType, ""),
-			withDefault(inst.ImageId, ""),
-			withDefault(&time, ""),
-			withDefault(inst.KeyName, ""),
-			withDefault(inst.InstanceId, ""),
+			util.WithEmptyStringDefault(inst.PublicIpAddress),
+			util.WithEmptyStringDefault(inst.PrivateIpAddress),
+			util.WithEmptyStringDefault(findTagByKey(inst, "Name")),
+			util.WithEmptyStringDefault(inst.State.Name),
+			util.WithEmptyStringDefault(inst.InstanceType),
+			util.WithEmptyStringDefault(inst.ImageId),
+			util.WithEmptyStringDefault(&time),
+			util.WithEmptyStringDefault(inst.KeyName),
+			util.WithEmptyStringDefault(inst.InstanceId),
 		}
 		records = append(records, rec)
 	}
@@ -223,7 +216,7 @@ func chooseInstanceForConnect(instances []*ec2.Instance) *ec2.Instance {
 }
 
 func connect(inst *ec2.Instance) {
-	name := withDefault(findTagByKey(inst, "Name"), "")
+	name := util.WithEmptyStringDefault(findTagByKey(inst, "Name"))
 	ip := *inst.PrivateIpAddress
 
 	cmd := sshCommand(ip)

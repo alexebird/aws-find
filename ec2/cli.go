@@ -1,13 +1,12 @@
 package ec2
 
 import (
-	d "github.com/alexebird/aws-find/davinci"
+	env "github.com/alexebird/aws-find/env"
 	//"github.com/davecgh/go-spew/spew"
 	"github.com/urfave/cli"
 )
 
 func cliAction(c *cli.Context) error {
-	//spew.Dump(c.Bool("all"))
 	client, err := setup()
 	if err != nil {
 		return err
@@ -15,13 +14,13 @@ func cliAction(c *cli.Context) error {
 
 	instances := describeInstances(client, c.Bool("all"), c.String("filter"))
 
-	if c.Bool("all") == false && d.DavinciEnvFull() != nil {
+	if c.Bool("all") == false && env.DavinciEnvFull() != nil {
 		davinciShortFormTable(instances)
-	} else if c.Bool("all") == false && d.DavinciEnvFull() == nil {
+	} else if c.Bool("all") == false && env.DavinciEnvFull() == nil {
 		shortFormTable(instances)
-	} else if c.Bool("all") == true && d.DavinciEnvFull() != nil {
+	} else if c.Bool("all") == true && env.DavinciEnvFull() != nil {
 		davinciLongFormTable(instances)
-	} else if c.Bool("all") == true && d.DavinciEnvFull() == nil {
+	} else if c.Bool("all") == true && env.DavinciEnvFull() == nil {
 		longFormTable(instances)
 	}
 
@@ -34,7 +33,6 @@ func cliAction(c *cli.Context) error {
 }
 
 func CliCommand() cli.Command {
-	//var all bool
 	flags := []cli.Flag{
 		cli.BoolFlag{
 			Name:  "all, a",
@@ -55,5 +53,6 @@ func CliCommand() cli.Command {
 		Name:   "ec2",
 		Action: cliAction,
 		Flags:  flags,
+		UseShortOptionHandling: true,
 	}
 }
