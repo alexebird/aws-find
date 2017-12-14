@@ -7,15 +7,17 @@ import (
 	"strings"
 	"time"
 
+	config "github.com/alexebird/aws-find/config"
 	env "github.com/alexebird/aws-find/env"
-	"github.com/alexebird/aws-find/util"
+	util "github.com/alexebird/aws-find/util"
 	"github.com/alexebird/tableme/tableme"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
-	//"github.com/kballard/go-shellquote"
 	//"github.com/davecgh/go-spew/spew"
 )
+
+var Config config.AwsFindConfig
 
 type ByRepositoryName []*ecr.Repository
 
@@ -72,7 +74,7 @@ func printReposTable(repos []*ecr.Repository) {
 
 	for _, inst := range repos {
 		rec := []string{
-			util.WithEmptyStringDefault(inst.RepositoryName),
+			tableme.WithEmptyStringDefault(inst.RepositoryName),
 		}
 		records = append(records, rec)
 	}
@@ -143,18 +145,16 @@ func printImagesTable(repos []*ecr.ImageDetail, minTags int) {
 		imgTags := imgTagString(img.ImageTags)
 
 		rec := []string{
-			util.WithEmptyStringDefault(&imgTags),
-			util.WithEmptyStringDefault(&pushedAt),
-			util.WithEmptyStringDefault(&imgSize),
-			util.WithEmptyStringDefault(img.ImageDigest),
+			tableme.WithEmptyStringDefault(&imgTags),
+			tableme.WithEmptyStringDefault(&pushedAt),
+			tableme.WithEmptyStringDefault(&imgSize),
+			tableme.WithEmptyStringDefault(img.ImageDigest),
 		}
 		records = append(records, rec)
 	}
 
-	err := tableme.TableMe(headers, records)
-	if err != nil {
-		os.Exit(1)
-	}
+	bites := tableme.TableMe(headers, records)
+	util.PrintColorizedTable(bites, "ecr", Config.Tableme.Colorize)
 }
 
 func setup() (*ecr.ECR, error) {

@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alexebird/aws-find/util"
+	config "github.com/alexebird/aws-find/config"
+	util "github.com/alexebird/aws-find/util"
 	"github.com/alexebird/tableme/tableme"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -15,6 +16,8 @@ import (
 	"github.com/kballard/go-shellquote"
 	//"github.com/davecgh/go-spew/spew"
 )
+
+var Config config.AwsFindConfig
 
 func filterInstances(instances []*ec2.Instance, test func(*ec2.Instance) bool) (ret []*ec2.Instance) {
 	for _, i := range instances {
@@ -100,10 +103,8 @@ func davinciShortFormTable(instances []*ec2.Instance) {
 		records = append(records, rec)
 	}
 
-	err := tableme.TableMe(headers, records)
-	if err != nil {
-		os.Exit(1)
-	}
+	bites := tableme.TableMe(headers, records)
+	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
 }
 
 func davinciLongFormTable(instances []*ec2.Instance) {
@@ -117,26 +118,24 @@ func davinciLongFormTable(instances []*ec2.Instance) {
 		time := inst.LaunchTime.Format(time.RFC3339)
 
 		rec := []string{
-			util.WithEmptyStringDefault(inst.PublicIpAddress),
-			util.WithEmptyStringDefault(inst.PrivateIpAddress),
-			util.WithEmptyStringDefault(findTagByKey(inst, "Name")),
-			util.WithEmptyStringDefault(findTagByKey(inst, "color")),
-			util.WithEmptyStringDefault(findTagByKey(inst, "role")),
-			util.WithEmptyStringDefault(findTagByKey(inst, "env")),
-			util.WithEmptyStringDefault(inst.State.Name),
-			util.WithEmptyStringDefault(inst.InstanceType),
-			util.WithEmptyStringDefault(inst.ImageId),
-			util.WithEmptyStringDefault(&time),
-			util.WithEmptyStringDefault(inst.KeyName),
-			util.WithEmptyStringDefault(inst.InstanceId),
+			tableme.WithEmptyStringDefault(inst.PublicIpAddress),
+			tableme.WithEmptyStringDefault(inst.PrivateIpAddress),
+			tableme.WithEmptyStringDefault(findTagByKey(inst, "Name")),
+			tableme.WithEmptyStringDefault(findTagByKey(inst, "color")),
+			tableme.WithEmptyStringDefault(findTagByKey(inst, "role")),
+			tableme.WithEmptyStringDefault(findTagByKey(inst, "env")),
+			tableme.WithEmptyStringDefault(inst.State.Name),
+			tableme.WithEmptyStringDefault(inst.InstanceType),
+			tableme.WithEmptyStringDefault(inst.ImageId),
+			tableme.WithEmptyStringDefault(&time),
+			tableme.WithEmptyStringDefault(inst.KeyName),
+			tableme.WithEmptyStringDefault(inst.InstanceId),
 		}
 		records = append(records, rec)
 	}
 
-	err := tableme.TableMe(headers, records)
-	if err != nil {
-		os.Exit(1)
-	}
+	bites := tableme.TableMe(headers, records)
+	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
 }
 
 func shortFormTable(instances []*ec2.Instance) {
@@ -158,10 +157,8 @@ func shortFormTable(instances []*ec2.Instance) {
 		records = append(records, rec)
 	}
 
-	err := tableme.TableMe(headers, records)
-	if err != nil {
-		os.Exit(1)
-	}
+	bites := tableme.TableMe(headers, records)
+	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
 }
 
 func longFormTable(instances []*ec2.Instance) {
@@ -175,23 +172,21 @@ func longFormTable(instances []*ec2.Instance) {
 		time := inst.LaunchTime.Format(time.RFC3339)
 
 		rec := []string{
-			util.WithEmptyStringDefault(inst.PublicIpAddress),
-			util.WithEmptyStringDefault(inst.PrivateIpAddress),
-			util.WithEmptyStringDefault(findTagByKey(inst, "Name")),
-			util.WithEmptyStringDefault(inst.State.Name),
-			util.WithEmptyStringDefault(inst.InstanceType),
-			util.WithEmptyStringDefault(inst.ImageId),
-			util.WithEmptyStringDefault(&time),
-			util.WithEmptyStringDefault(inst.KeyName),
-			util.WithEmptyStringDefault(inst.InstanceId),
+			tableme.WithEmptyStringDefault(inst.PublicIpAddress),
+			tableme.WithEmptyStringDefault(inst.PrivateIpAddress),
+			tableme.WithEmptyStringDefault(findTagByKey(inst, "Name")),
+			tableme.WithEmptyStringDefault(inst.State.Name),
+			tableme.WithEmptyStringDefault(inst.InstanceType),
+			tableme.WithEmptyStringDefault(inst.ImageId),
+			tableme.WithEmptyStringDefault(&time),
+			tableme.WithEmptyStringDefault(inst.KeyName),
+			tableme.WithEmptyStringDefault(inst.InstanceId),
 		}
 		records = append(records, rec)
 	}
 
-	err := tableme.TableMe(headers, records)
-	if err != nil {
-		os.Exit(1)
-	}
+	bites := tableme.TableMe(headers, records)
+	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
 }
 
 func sshCommand(ip string) []string {
@@ -216,7 +211,7 @@ func chooseInstanceForConnect(instances []*ec2.Instance) *ec2.Instance {
 }
 
 func connect(inst *ec2.Instance) {
-	name := util.WithEmptyStringDefault(findTagByKey(inst, "Name"))
+	name := tableme.WithEmptyStringDefault(findTagByKey(inst, "Name"))
 	ip := *inst.PrivateIpAddress
 
 	cmd := sshCommand(ip)

@@ -1,6 +1,7 @@
 BINARY := af
 PROJECT_ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-SOURCE_FILES := main.go ec2/cli.go ec2/ec2.go
+SOURCEDIR := .
+SOURCE_FILES := $(shell find $(SOURCEDIR) -name '*.go')
 
 .PHONY: all
 all: pkg/darwin_amd64/$(BINARY)-darwin-amd64 pkg/linux_amd64/$(BINARY)-linux-amd64
@@ -16,6 +17,9 @@ pkg/linux_amd64/$(BINARY)-linux-amd64: $(SOURCE_FILES)
 install:
 	cp pkg/linux_amd64/$(BINARY)-linux-amd64 /usr/local/bin/$(BINARY)
 	chmod 755 /usr/local/bin/$(BINARY)
+
+uninstall:
+	rm -f /usr/local/bin/$(BINARY)
 
 .PHONY: deps
 deps:
