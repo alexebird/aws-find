@@ -42,8 +42,7 @@ func (s ByImagePushedAt) Swap(i, j int) {
 func (s ByImagePushedAt) Less(i, j int) bool {
 	ti := *s[i].ImagePushedAt
 	tj := *s[j].ImagePushedAt
-	// reverse sort
-	return tj.Before(ti)
+	return tj.After(ti)
 }
 
 func describeRepositories(client *ecr.ECR) []*ecr.Repository {
