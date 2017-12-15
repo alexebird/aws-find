@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 	"time"
 
@@ -18,6 +19,21 @@ import (
 )
 
 var Config config.AwsFindConfig
+
+type ByLaunchTime []*ec2.Instance
+
+func (s ByLaunchTime) Len() int {
+	return len(s)
+}
+func (s ByLaunchTime) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s ByLaunchTime) Less(i, j int) bool {
+	ti := *s[i].LaunchTime
+	tj := *s[j].LaunchTime
+	// reverse sort
+	return tj.Before(ti)
+}
 
 func filterInstances(instances []*ec2.Instance, test func(*ec2.Instance) bool) (ret []*ec2.Instance) {
 	for _, i := range instances {
@@ -68,6 +84,8 @@ func describeInstances(client *ec2.EC2, all bool, nameFilter string) []*ec2.Inst
 		}
 		instances = filterInstances(instances, filterTest)
 	}
+
+	sort.Sort(ByLaunchTime(instances))
 
 	return instances
 }
