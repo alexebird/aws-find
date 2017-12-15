@@ -1,6 +1,7 @@
 package ec2
 
 import (
+	"fmt"
 	env "github.com/alexebird/aws-find/env"
 	//"github.com/davecgh/go-spew/spew"
 	"github.com/urfave/cli"
@@ -26,7 +27,11 @@ func cliAction(c *cli.Context) error {
 
 	if c.Bool("connect") {
 		inst := chooseInstanceForConnect(instances)
-		connect(inst)
+		if inst != nil {
+			connect(inst)
+		} else {
+			fmt.Println("no connectable instances")
+		}
 	}
 
 	return nil

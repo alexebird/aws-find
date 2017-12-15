@@ -91,14 +91,14 @@ func davinciShortFormTable(instances []*ec2.Instance) {
 
 	for _, inst := range instances {
 		rec := []string{
-			*inst.PrivateIpAddress,
-			*findTagByKey(inst, "Name"),
-			*findTagByKey(inst, "color"),
-			*findTagByKey(inst, "role"),
-			*inst.State.Name,
-			*inst.InstanceType,
-			*inst.ImageId,
-			*inst.KeyName,
+			tableme.StringifyStringPtr(inst.PrivateIpAddress),
+			tableme.StringifyStringPtr(findTagByKey(inst, "Name")),
+			tableme.StringifyStringPtr(findTagByKey(inst, "color")),
+			tableme.StringifyStringPtr(findTagByKey(inst, "role")),
+			tableme.StringifyStringPtr(inst.State.Name),
+			tableme.StringifyStringPtr(inst.InstanceType),
+			tableme.StringifyStringPtr(inst.ImageId),
+			tableme.StringifyStringPtr(inst.KeyName),
 		}
 		records = append(records, rec)
 	}
@@ -207,7 +207,13 @@ func execInteractive(cmdArgs []string) {
 }
 
 func chooseInstanceForConnect(instances []*ec2.Instance) *ec2.Instance {
-	return instances[0]
+	for _, inst := range instances {
+		if *inst.State.Name == "running" {
+			return inst
+		}
+	}
+
+	return nil
 }
 
 func connect(inst *ec2.Instance) {
