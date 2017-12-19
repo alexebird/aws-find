@@ -2,7 +2,6 @@ package ecr
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 	"time"
@@ -78,10 +77,8 @@ func printReposTable(repos []*ecr.Repository) {
 		records = append(records, rec)
 	}
 
-	err := tableme.TableMe(headers, records)
-	if err != nil {
-		os.Exit(1)
-	}
+	bites := tableme.TableMe(headers, records)
+	util.PrintColorizedTable(bites, "ecr", Config.Tableme.Colorize)
 }
 
 func describeImages(client *ecr.ECR, repo string, all bool) []*ecr.ImageDetail {
