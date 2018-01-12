@@ -77,7 +77,7 @@ func describeInstances(client *ec2.EC2, all bool, nameFilter string) []*ec2.Inst
 		filterTest := func(i *ec2.Instance) bool {
 			nameTagValue := findTagByKey(i, "Name")
 			if nameTagValue != nil {
-				return strings.Contains(*nameTagValue, nameFilter)
+				return strings.Contains(strings.ToLower(*nameTagValue), strings.ToLower(nameFilter))
 			} else {
 				return false
 			}
