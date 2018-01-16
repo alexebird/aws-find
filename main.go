@@ -19,6 +19,18 @@ func main() {
 	app.Name = "aws-find"
 	app.Version = "0.0.2"
 
+	flags := []cli.Flag{
+		cli.BoolFlag{
+			Name:  "color, C",
+			Usage: "force color",
+		},
+		cli.BoolFlag{
+			Name:  "monochrome, M",
+			Usage: "force no color",
+		},
+	}
+	app.Flags = flags
+
 	app.Commands = []cli.Command{
 		afec2.CliCommand(),
 		afecr.CliCommand(),

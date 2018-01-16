@@ -4,6 +4,7 @@ import (
 	"fmt"
 	env "github.com/alexebird/aws-find/env"
 	//"github.com/davecgh/go-spew/spew"
+	"github.com/fatih/color"
 	"github.com/urfave/cli"
 )
 
@@ -14,6 +15,12 @@ func cliAction(c *cli.Context) error {
 	}
 
 	instances := describeInstances(client, c.Bool("all"), c.String("filter"))
+
+	if c.GlobalBool("color") == true {
+		color.NoColor = false
+	} else if c.GlobalBool("monochrome") == true {
+		color.NoColor = true
+	}
 
 	if c.Bool("all") == false && env.DavinciEnvFull() != nil {
 		davinciShortFormTable(instances)
