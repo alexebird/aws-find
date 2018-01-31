@@ -14,8 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/kballard/go-shellquote"
 	//"github.com/davecgh/go-spew/spew"
+	"github.com/kballard/go-shellquote"
 )
 
 var Config config.AwsFindConfig
@@ -44,18 +44,34 @@ func filterInstances(instances []*ec2.Instance, test func(*ec2.Instance) bool) (
 	return
 }
 
+func autofilters() []*ec2.Filter {
+	if Config.Ec2.Autofilter.Tag != "" && len(Config.Ec2.Autofilter.Values) > 0 {
+		values := make([]*string, 0)
+
+		for _, val := range Config.Ec2.Autofilter.Values {
+			values = append(values, aws.String(os.Getenv(val.EnvVar)))
+		}
+
+		filters := []*ec2.Filter{
+			{
+				Name:   aws.String("tag:" + Config.Ec2.Autofilter.Tag),
+				Values: values,
+			},
+		}
+		return filters
+
+	} else {
+		return nil
+	}
+}
+
 func describeInstances(client *ec2.EC2, all bool, nameFilter string) []*ec2.Instance {
 	var filters []*ec2.Filter
 
 	if all == true {
 		filters = nil
 	} else {
-		filters = []*ec2.Filter{
-			{
-				Name:   aws.String("tag:env"),
-				Values: []*string{aws.String("dev-0")},
-			},
-		}
+		filters = autofilters()
 	}
 
 	params := &ec2.DescribeInstancesInput{Filters: filters}

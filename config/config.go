@@ -11,6 +11,7 @@ var Config AwsFindConfig
 
 type AwsFindConfig struct {
 	Tableme TablemeConfig
+	Ec2     Ec2Config
 }
 
 //type SubcmdsConfig struct {
@@ -22,9 +23,22 @@ type AwsFindConfig struct {
 //Tableme TablemeConfig
 //}
 
-//type Ec2Config struct {
-//Tableme TablemeConfig
+type AutofilterConfig struct {
+	Tag    string
+	Values []EnvVarConfig
+}
+
+//type ValuesConfig struct {
+//EnvVars []EnvVarConfig
 //}
+
+type EnvVarConfig struct {
+	EnvVar string `yaml:"env_var"`
+}
+
+type Ec2Config struct {
+	Autofilter AutofilterConfig
+}
 
 type TablemeConfig struct {
 	Colorize []ColorizeConfig
