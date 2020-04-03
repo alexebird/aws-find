@@ -116,63 +116,63 @@ func findTagByKey(instance *ec2.Instance, key string) *string {
 	return nil
 }
 
-func davinciShortFormTable(instances []*ec2.Instance) {
-	headers := []string{
-		"PRIVATE_IP", "NAME", "COLOR", "ROLE", "STATE", "TYPE", "IMAGE", "KEY",
-	}
+//func davinciShortFormTable(instances []*ec2.Instance) {
+//headers := []string{
+//"PRIVATE_IP", "NAME", "COLOR", "ROLE", "STATE", "TYPE", "IMAGE", "KEY",
+//}
 
-	records := make([][]string, 0)
+//records := make([][]string, 0)
 
-	for _, inst := range instances {
-		rec := []string{
-			tableme.StringifyStringPtr(inst.PrivateIpAddress),
-			tableme.StringifyStringPtr(findTagByKey(inst, "Name")),
-			tableme.StringifyStringPtr(findTagByKey(inst, "color")),
-			tableme.StringifyStringPtr(findTagByKey(inst, "role")),
-			tableme.StringifyStringPtr(inst.State.Name),
-			tableme.StringifyStringPtr(inst.InstanceType),
-			tableme.StringifyStringPtr(inst.ImageId),
-			tableme.StringifyStringPtr(inst.KeyName),
-		}
-		records = append(records, rec)
-	}
+//for _, inst := range instances {
+//rec := []string{
+//tableme.StringifyStringPtr(inst.PrivateIpAddress),
+//tableme.StringifyStringPtr(findTagByKey(inst, "Name")),
+//tableme.StringifyStringPtr(findTagByKey(inst, "color")),
+//tableme.StringifyStringPtr(findTagByKey(inst, "role")),
+//tableme.StringifyStringPtr(inst.State.Name),
+//tableme.StringifyStringPtr(inst.InstanceType),
+//tableme.StringifyStringPtr(inst.ImageId),
+//tableme.StringifyStringPtr(inst.KeyName),
+//}
+//records = append(records, rec)
+//}
 
-	bites := tableme.TableMe(headers, records)
-	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
-}
+//bites := tableme.TableMe(headers, records)
+//util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
+//}
 
-func davinciLongFormTable(instances []*ec2.Instance) {
-	headers := []string{
-		"PUBLIC_IP", "PRIVATE_IP", "NAME", "COLOR", "ROLE", "ENV", "STATE", "TYPE", "IMAGE", "LAUNCHED", "KEY", "ID", //"SUBNET", "CIDR",
-	}
+//func davinciLongFormTable(instances []*ec2.Instance) {
+//headers := []string{
+//"PUBLIC_IP", "PRIVATE_IP", "NAME", "COLOR", "ROLE", "ENV", "STATE", "TYPE", "IMAGE", "LAUNCHED", "KEY", "ID", //"SUBNET", "CIDR",
+//}
 
-	records := make([][]string, 0)
+//records := make([][]string, 0)
 
-	for _, inst := range instances {
-		time := inst.LaunchTime.Format(time.RFC3339)
+//for _, inst := range instances {
+//time := inst.LaunchTime.Format(time.RFC3339)
 
-		rec := []string{
-			tableme.WithEmptyStringDefault(inst.PublicIpAddress),
-			tableme.WithEmptyStringDefault(inst.PrivateIpAddress),
-			tableme.WithEmptyStringDefault(findTagByKey(inst, "Name")),
-			tableme.WithEmptyStringDefault(findTagByKey(inst, "color")),
-			tableme.WithEmptyStringDefault(findTagByKey(inst, "role")),
-			tableme.WithEmptyStringDefault(findTagByKey(inst, "env")),
-			tableme.WithEmptyStringDefault(inst.State.Name),
-			tableme.WithEmptyStringDefault(inst.InstanceType),
-			tableme.WithEmptyStringDefault(inst.ImageId),
-			tableme.WithEmptyStringDefault(&time),
-			tableme.WithEmptyStringDefault(inst.KeyName),
-			tableme.WithEmptyStringDefault(inst.InstanceId),
-		}
-		records = append(records, rec)
-	}
+//rec := []string{
+//tableme.WithEmptyStringDefault(inst.PublicIpAddress),
+//tableme.WithEmptyStringDefault(inst.PrivateIpAddress),
+//tableme.WithEmptyStringDefault(findTagByKey(inst, "Name")),
+//tableme.WithEmptyStringDefault(findTagByKey(inst, "color")),
+//tableme.WithEmptyStringDefault(findTagByKey(inst, "role")),
+//tableme.WithEmptyStringDefault(findTagByKey(inst, "env")),
+//tableme.WithEmptyStringDefault(inst.State.Name),
+//tableme.WithEmptyStringDefault(inst.InstanceType),
+//tableme.WithEmptyStringDefault(inst.ImageId),
+//tableme.WithEmptyStringDefault(&time),
+//tableme.WithEmptyStringDefault(inst.KeyName),
+//tableme.WithEmptyStringDefault(inst.InstanceId),
+//}
+//records = append(records, rec)
+//}
 
-	bites := tableme.TableMe(headers, records)
-	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
-}
+//bites := tableme.TableMe(headers, records)
+//util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
+//}
 
-func shortFormTable(instances []*ec2.Instance) {
+func shortFormTable(instances []*ec2.Instance, noHeaders bool) {
 	headers := []string{
 		"PRIVATE_IP", "NAME", "STATE", "TYPE", "IMAGE", "KEY",
 	}
@@ -181,21 +181,21 @@ func shortFormTable(instances []*ec2.Instance) {
 
 	for _, inst := range instances {
 		rec := []string{
-			*inst.PrivateIpAddress,
-			*findTagByKey(inst, "Name"),
-			*inst.State.Name,
-			*inst.InstanceType,
-			*inst.ImageId,
-			*inst.KeyName,
+			tableme.WithEmptyStringDefault(inst.PublicIpAddress),
+			tableme.WithEmptyStringDefault(findTagByKey(inst, "Name")),
+			tableme.WithEmptyStringDefault(inst.State.Name),
+			tableme.WithEmptyStringDefault(inst.InstanceType),
+			tableme.WithEmptyStringDefault(inst.ImageId),
+			tableme.WithEmptyStringDefault(inst.KeyName),
 		}
 		records = append(records, rec)
 	}
 
-	bites := tableme.TableMe(headers, records)
+	bites := tableme.TableMe(headers, records, noHeaders)
 	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
 }
 
-func longFormTable(instances []*ec2.Instance) {
+func longFormTable(instances []*ec2.Instance, noHeaders bool) {
 	headers := []string{
 		"PUBLIC_IP", "PRIVATE_IP", "NAME", "STATE", "TYPE", "IMAGE", "LAUNCHED", "KEY", "ID", //"SUBNET", "CIDR",
 	}
@@ -219,7 +219,7 @@ func longFormTable(instances []*ec2.Instance) {
 		records = append(records, rec)
 	}
 
-	bites := tableme.TableMe(headers, records)
+	bites := tableme.TableMe(headers, records, noHeaders)
 	util.PrintColorizedTable(bites, "ec2", Config.Tableme.Colorize)
 }
 
@@ -252,7 +252,7 @@ func chooseInstanceForConnect(instances []*ec2.Instance) *ec2.Instance {
 
 func connect(inst *ec2.Instance) {
 	name := tableme.WithEmptyStringDefault(findTagByKey(inst, "Name"))
-	ip := *inst.PrivateIpAddress
+	ip := *inst.PublicIpAddress
 
 	cmd := sshCommand(ip)
 

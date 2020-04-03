@@ -17,12 +17,14 @@ func cliAction(c *cli.Context) error {
 	all := c.Bool("all")
 	minTags := c.Int("min-tags")
 
+	noHeaders := c.GlobalBool("no-headers")
+
 	if repo == "" {
 		repos := describeRepositories(client)
-		printReposTable(repos)
+		printReposTable(repos, noHeaders)
 	} else {
 		images := describeImages(client, repo, all)
-		printImagesTable(images, minTags)
+		printImagesTable(images, minTags, noHeaders)
 	}
 
 	return nil
@@ -46,9 +48,9 @@ func CliCommand() cli.Command {
 	}
 
 	return cli.Command{
-		Name:   "ecr",
-		Action: cliAction,
-		Flags:  flags,
+		Name:                   "ecr",
+		Action:                 cliAction,
+		Flags:                  flags,
 		UseShortOptionHandling: true,
 	}
 }

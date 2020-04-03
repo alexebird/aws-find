@@ -28,6 +28,10 @@ func main() {
 			Name:  "monochrome, M",
 			Usage: "force no color",
 		},
+		cli.BoolFlag{
+			Name:  "no-headers, H",
+			Usage: "dont print headers",
+		},
 	}
 	app.Flags = flags
 

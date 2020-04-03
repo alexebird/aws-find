@@ -74,7 +74,7 @@ func mapLaunchConfigurationName(lcs []*autoscaling.LaunchConfiguration) map[stri
 	return mapping
 }
 
-func printAutoScalingGroupsTable(asgs []*autoscaling.Group, lcs []*autoscaling.LaunchConfiguration) {
+func printAutoScalingGroupsTable(asgs []*autoscaling.Group, lcs []*autoscaling.LaunchConfiguration, noHeaders bool) {
 	sort.Sort(ByName(asgs))
 
 	headers := []string{
@@ -112,7 +112,7 @@ func printAutoScalingGroupsTable(asgs []*autoscaling.Group, lcs []*autoscaling.L
 		records = append(records, rec)
 	}
 
-	bites := tableme.TableMe(headers, records)
+	bites := tableme.TableMe(headers, records, noHeaders)
 	util.PrintColorizedTable(bites, "asg", Config.Tableme.Colorize)
 }
 

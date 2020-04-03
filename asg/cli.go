@@ -14,6 +14,8 @@ func cliAction(c *cli.Context) error {
 		return err
 	}
 
+	noHeaders := c.GlobalBool("no-headers")
+
 	chanAsg := make(chan []*autoscaling.Group)
 	chanLc := make(chan []*autoscaling.LaunchConfiguration)
 
@@ -29,7 +31,7 @@ func cliAction(c *cli.Context) error {
 	lcs := <-chanLc
 	//spew.Dump(asgs, lcs)
 
-	printAutoScalingGroupsTable(asgs, lcs)
+	printAutoScalingGroupsTable(asgs, lcs, noHeaders)
 
 	//repo := c.String("repo")
 	//all := c.Bool("all")

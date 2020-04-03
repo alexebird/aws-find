@@ -61,7 +61,7 @@ func describeRepositories(client *ecr.ECR) []*ecr.Repository {
 	return repos
 }
 
-func printReposTable(repos []*ecr.Repository) {
+func printReposTable(repos []*ecr.Repository, noHeaders bool) {
 	sort.Sort(ByRepositoryName(repos))
 
 	headers := []string{
@@ -77,7 +77,7 @@ func printReposTable(repos []*ecr.Repository) {
 		records = append(records, rec)
 	}
 
-	bites := tableme.TableMe(headers, records)
+	bites := tableme.TableMe(headers, records, noHeaders)
 	util.PrintColorizedTable(bites, "ecr", Config.Tableme.Colorize)
 }
 
@@ -122,7 +122,7 @@ func imgTagString(tags []*string) string {
 	return strings.Join(newTags, ",")
 }
 
-func printImagesTable(repos []*ecr.ImageDetail, minTags int) {
+func printImagesTable(repos []*ecr.ImageDetail, minTags int, noHeaders bool) {
 	sort.Sort(ByImagePushedAt(repos))
 
 	headers := []string{
@@ -149,7 +149,7 @@ func printImagesTable(repos []*ecr.ImageDetail, minTags int) {
 		records = append(records, rec)
 	}
 
-	bites := tableme.TableMe(headers, records)
+	bites := tableme.TableMe(headers, records, noHeaders)
 	util.PrintColorizedTable(bites, "ecr", Config.Tableme.Colorize)
 }
 

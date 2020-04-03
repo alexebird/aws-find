@@ -15,6 +15,7 @@ func cliAction(c *cli.Context) error {
 	}
 
 	instances := describeInstances(client, c.Bool("all"), c.String("filter"))
+	noHeaders := c.GlobalBool("no-headers")
 
 	if c.GlobalBool("color") == true {
 		color.NoColor = false
@@ -22,14 +23,16 @@ func cliAction(c *cli.Context) error {
 		color.NoColor = true
 	}
 
-	if c.Bool("all") == false && env.DavinciEnvFull() != nil {
-		davinciShortFormTable(instances)
-	} else if c.Bool("all") == false && env.DavinciEnvFull() == nil {
-		shortFormTable(instances)
-	} else if c.Bool("all") == true && env.DavinciEnvFull() != nil {
-		davinciLongFormTable(instances)
+	//if c.Bool("all") == false && env.DavinciEnvFull() != nil {
+	//davinciShortFormTable(instances, noHeaders)
+	//}
+	//else if c.Bool("all") == true && env.DavinciEnvFull() != nil {
+	//davinciLongFormTable(instances, noHeaders)
+	//}
+	if c.Bool("all") == false && env.DavinciEnvFull() == nil {
+		shortFormTable(instances, noHeaders)
 	} else if c.Bool("all") == true && env.DavinciEnvFull() == nil {
-		longFormTable(instances)
+		longFormTable(instances, noHeaders)
 	}
 
 	if c.Bool("connect") {
@@ -62,9 +65,9 @@ func CliCommand() cli.Command {
 	}
 
 	return cli.Command{
-		Name:   "ec2",
-		Action: cliAction,
-		Flags:  flags,
+		Name:                   "ec2",
+		Action:                 cliAction,
+		Flags:                  flags,
 		UseShortOptionHandling: true,
 	}
 }
