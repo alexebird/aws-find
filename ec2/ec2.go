@@ -174,7 +174,7 @@ func findTagByKey(instance *ec2.Instance, key string) *string {
 
 func shortFormTable(instances []*ec2.Instance, noHeaders bool) {
 	headers := []string{
-		"PRIVATE_IP", "NAME", "STATE", "TYPE", "IMAGE", "KEY",
+		"PUBLIC_IP", "NAME", "STATE", "TYPE", "IMAGE", "KEY",
 	}
 
 	records := make([][]string, 0)
@@ -224,7 +224,7 @@ func longFormTable(instances []*ec2.Instance, noHeaders bool) {
 }
 
 func sshCommand(ip string) []string {
-	return []string{"ssh", ip}
+	return []string{"ssh", "-o", "ConnectionAttempts 10", ip}
 }
 
 func execInteractive(cmdArgs []string) {
