@@ -14,30 +14,13 @@ type AwsFindConfig struct {
 	Ec2     Ec2Config
 }
 
-//type SubcmdsConfig struct {
-//Ec2 Ec2Config
-//Ecr EcrConfig
-//}
-
-//type EcrConfig struct {
-//Tableme TablemeConfig
-//}
-
-type AutofilterConfig struct {
-	Tag    string
-	Values []EnvVarConfig
-}
-
-//type ValuesConfig struct {
-//EnvVars []EnvVarConfig
-//}
-
-type EnvVarConfig struct {
-	EnvVar string `yaml:"env_var"`
+type FilterConfig struct {
+	Name   string
+	Values []string
 }
 
 type Ec2Config struct {
-	Autofilter AutofilterConfig
+	Filters []FilterConfig
 }
 
 type TablemeConfig struct {

@@ -2,6 +2,7 @@ package ec2
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"sort"
@@ -14,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	//"github.com/davecgh/go-spew/spew"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kballard/go-shellquote"
 )
 
@@ -44,20 +45,34 @@ func filterInstances(instances []*ec2.Instance, test func(*ec2.Instance) bool) (
 	return
 }
 
-func autofilters() []*ec2.Filter {
-	if Config.Ec2.Autofilter.Tag != "" && len(Config.Ec2.Autofilter.Values) > 0 {
-		values := make([]*string, 0)
+func configFilters() []*ec2.Filter {
+	if len(Config.Ec2.Filters) > 0 {
+		filters := make([]*ec2.Filter, 0)
+		for _, confF := range Config.Ec2.Filters {
+			values := make([]*string, 0)
+			for _, val := range confF.Values {
+				if strings.HasPrefix(val, "$") {
+					val = strings.TrimLeft(val, "${")
+					val = strings.TrimRight(val, "}")
+					val = os.Getenv(val)
+				}
 
-		for _, val := range Config.Ec2.Autofilter.Values {
-			values = append(values, aws.String(os.Getenv(val.EnvVar)))
-		}
+				if val == "" {
+					spew.Dump(Config)
+					log.Fatalf("bad filtering for val=%v", val)
+				}
 
-		filters := []*ec2.Filter{
-			{
-				Name:   aws.String("tag:" + Config.Ec2.Autofilter.Tag),
+				values = append(values, aws.String(val))
+			}
+
+			filter := ec2.Filter{
+				Name:   aws.String(confF.Name),
 				Values: values,
-			},
+			}
+			filters = append(filters, &filter)
 		}
+
+		spew.Dump(filters)
 		return filters
 
 	} else {
@@ -71,7 +86,7 @@ func describeInstances(client *ec2.EC2, all bool, nameFilter string) []*ec2.Inst
 	if all == true {
 		filters = nil
 	} else {
-		filters = autofilters()
+		filters = configFilters()
 	}
 
 	params := &ec2.DescribeInstancesInput{Filters: filters}
