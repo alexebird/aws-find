@@ -1,0 +1,17 @@
+# goes in ~/.aws-find.yml
+---
+ec2:
+  filters:
+    - name: 'tag:Name'
+      values:
+        - '$foo'
+    - name: 'instance-state-name'
+      values:
+        - 'running'
+
+tableme:
+  colorize:
+    - color: 'green'
+      regex: 'running'
+      subcmds:
+        - ec2
