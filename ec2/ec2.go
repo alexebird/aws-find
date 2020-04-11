@@ -72,7 +72,7 @@ func configFilters() []*ec2.Filter {
 			filters = append(filters, &filter)
 		}
 
-		spew.Dump(filters)
+		//spew.Dump(filters)
 		return filters
 
 	} else {
