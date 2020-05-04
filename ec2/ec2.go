@@ -189,7 +189,7 @@ func findTagByKey(instance *ec2.Instance, key string) *string {
 
 func shortFormTable(instances []*ec2.Instance, noHeaders bool) {
 	headers := []string{
-		"PUBLIC_IP", "NAME", "STATE", "TYPE", "IMAGE", "KEY",
+		"PUBLIC_IP", "PRIVATE_IP", "NAME", "STATE", "TYPE", "IMAGE", "KEY",
 	}
 
 	records := make([][]string, 0)
@@ -197,6 +197,7 @@ func shortFormTable(instances []*ec2.Instance, noHeaders bool) {
 	for _, inst := range instances {
 		rec := []string{
 			tableme.WithEmptyStringDefault(inst.PublicIpAddress),
+			tableme.WithEmptyStringDefault(inst.PrivateIpAddress),
 			tableme.WithEmptyStringDefault(findTagByKey(inst, "Name")),
 			tableme.WithEmptyStringDefault(inst.State.Name),
 			tableme.WithEmptyStringDefault(inst.InstanceType),

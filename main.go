@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	afami "github.com/alexebird/aws-find/ami"
 	afasg "github.com/alexebird/aws-find/asg"
 	config "github.com/alexebird/aws-find/config"
 	afec2 "github.com/alexebird/aws-find/ec2"
@@ -39,6 +40,7 @@ func main() {
 		afec2.CliCommand(),
 		afecr.CliCommand(),
 		afasg.CliCommand(),
+		afami.CliCommand(),
 	}
 
 	home, _ := homedir.Dir()
@@ -49,6 +51,7 @@ func main() {
 		afasg.Config = config
 		afec2.Config = config
 		afecr.Config = config
+		afami.Config = config
 	}
 
 	app.Run(os.Args)
