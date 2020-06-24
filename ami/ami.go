@@ -1,6 +1,7 @@
 package ami
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 
 var Config config.AwsFindConfig
 
+const longForm = "2006-01-02T15:04:05.999Z"
+
 type ByCreationDate []*ec2.Image
 
 func (s ByCreationDate) Len() int {
@@ -25,7 +28,6 @@ func (s ByCreationDate) Swap(i, j int) {
 }
 func (s ByCreationDate) Less(i, j int) bool {
 	//CreationDate: "2020-05-01T21:08:23.000Z",
-	const longForm = "2006-01-02T15:04:05.999Z"
 
 	ti := *s[i].CreationDate
 	//spew.Dump(ti)
@@ -105,12 +107,15 @@ func shortFormTable(images []*ec2.Image, noHeaders bool) {
 	records := make([][]string, 0)
 
 	for _, img := range images {
+		t, _ := time.Parse(longForm, *img.CreationDate)
+		elapsed := time.Now().Sub(t).Hours() / 24
+
 		rec := []string{
 			tableme.WithEmptyStringDefault(img.Name),
 			tableme.WithEmptyStringDefault(img.State),
 			tableme.StringifyBool(*img.Public),
 			tableme.WithEmptyStringDefault(img.OwnerId),
-			tableme.WithEmptyStringDefault(img.CreationDate),
+			tableme.StringifyString(fmt.Sprintf("%3.0fd %s", elapsed, *img.CreationDate)),
 			tableme.WithEmptyStringDefault(img.ImageId),
 		}
 		records = append(records, rec)

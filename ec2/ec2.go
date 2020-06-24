@@ -268,7 +268,8 @@ func chooseInstanceForConnect(instances []*ec2.Instance) *ec2.Instance {
 
 func connect(inst *ec2.Instance) {
 	name := tableme.WithEmptyStringDefault(findTagByKey(inst, "Name"))
-	ip := *inst.PublicIpAddress
+	//ip := *inst.PublicIpAddress
+	ip := *inst.PrivateIpAddress
 
 	cmd := sshCommand(ip)
 
