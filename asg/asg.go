@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+
 	//"time"
 
 	//env "github.com/alexebird/aws-find/env"
@@ -91,12 +92,16 @@ func printAutoScalingGroupsTable(asgs []*autoscaling.Group, lcs []*autoscaling.L
 	records := make([][]string, 0)
 
 	for _, asg := range asgs {
-		//spew.Dump(mappedLcs)
-		//spew.Dump(asg.LaunchConfigurationName)
-		lc := mappedLcs[*asg.LaunchConfigurationName]
-		//spew.Dump(lc)
-		lcImage := lc.ImageId
-		lcInstanceType := lc.InstanceType
+		var lcImage *string
+		var lcInstanceType *string
+		if asg.LaunchConfigurationName != nil {
+			//spew.Dump(mappedLcs)
+			//spew.Dump(asg.LaunchConfigurationName)
+			lc := mappedLcs[*asg.LaunchConfigurationName]
+			//spew.Dump(lc)
+			lcImage = lc.ImageId
+			lcInstanceType = lc.InstanceType
+		}
 		//time := asg.CreatedTime.Format(time.RFC3339)
 		sizeStr := fmt.Sprintf("%d,%d", *asg.MinSize, *asg.MaxSize)
 
